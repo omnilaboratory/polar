@@ -16,7 +16,7 @@
 # * final: Copy the binaries required at runtime
 # The resulting image uploaded to dockerhub will only contain what is needed for runtime.
 # From the root of the repository, run "docker build -t yourimage:yourtag ."
-FROM debian:stretch-slim as downloader
+FROM debian:buster-slim as downloader
 
 RUN set -ex \
 	&& apt-get update \
@@ -28,7 +28,7 @@ RUN wget -qO /opt/tini "https://github.com/krallin/tini/releases/download/v0.18.
     && echo "12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855 /opt/tini" | sha256sum -c - \
     && chmod +x /opt/tini
 
-ARG BITCOIN_VERSION=0.17.0
+ARG BITCOIN_VERSION=0.18.1
 ENV BITCOIN_TARBALL bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/$BITCOIN_TARBALL
 ENV BITCOIN_ASC_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/SHA256SUMS.asc
@@ -56,10 +56,10 @@ RUN mkdir /opt/litecoin && cd /opt/litecoin \
     && tar -xzvf litecoin.tar.gz $BD/litecoin-cli --strip-components=1 --exclude=*-qt \
     && rm litecoin.tar.gz
 
-FROM debian:stretch-slim as builder
+FROM debian:buster-slim as builder
 
 ENV LIGHTNINGD_VERSION=master
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates autoconf automake build-essential git libtool python python3 python3-mako wget gnupg dirmngr git gettext
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates autoconf automake build-essential git libtool python3 python3-pip python3-setuptools python3-mako wget gnupg dirmngr git gettext
 
 RUN wget -q https://zlib.net/zlib-1.2.11.tar.gz \
 && tar xvf zlib-1.2.11.tar.gz \
@@ -69,12 +69,12 @@ RUN wget -q https://zlib.net/zlib-1.2.11.tar.gz \
 && make install && cd .. && rm zlib-1.2.11.tar.gz && rm -rf zlib-1.2.11
 
 RUN apt-get install -y --no-install-recommends unzip tclsh \
-&& wget -q https://www.sqlite.org/2018/sqlite-src-3260000.zip \
-&& unzip sqlite-src-3260000.zip \
-&& cd sqlite-src-3260000 \
+&& wget -q https://www.sqlite.org/2019/sqlite-src-3290000.zip \
+&& unzip sqlite-src-3290000.zip \
+&& cd sqlite-src-3290000 \
 && ./configure --enable-static --disable-readline --disable-threadsafe --disable-load-extension \
 && make \
-&& make install && cd .. && rm sqlite-src-3260000.zip && rm -rf sqlite-src-3260000
+&& make install && cd .. && rm sqlite-src-3290000.zip && rm -rf sqlite-src-3290000
 
 RUN wget -q https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz \
 && tar xvf gmp-6.1.2.tar.xz \
@@ -99,16 +99,21 @@ RUN git clone --recursive --branch=v${CLN_VERSION} https://github.com/ElementsPr
 # Original line: ARG DEVELOPER=0
 ARG DEVELOPER=1
 ####################
+ENV PYTHON_VERSION=3
+RUN apt-get install -y --no-install-recommends python3-dev
+RUN pip3 install -U pip && pip3 install -r requirements.lock
 RUN ./configure --prefix=/tmp/lightning_install --enable-static && make -j3 DEVELOPER=${DEVELOPER} && make install
 
-FROM debian:stretch-slim as final
+FROM debian:buster-slim as final
+
 COPY --from=downloader /opt/tini /usr/bin/tini
-RUN apt-get update && apt-get install -y --no-install-recommends socat inotify-tools \
+RUN apt-get update && apt-get install -y --no-install-recommends socat inotify-tools python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LIGHTNINGD_DATA=/root/.lightning
 ENV LIGHTNINGD_RPC_PORT=9835
 ENV LIGHTNINGD_PORT=9735
+ENV LIGHTNINGD_NETWORK=bitcoin
 
 RUN mkdir $LIGHTNINGD_DATA && \
     touch $LIGHTNINGD_DATA/config
