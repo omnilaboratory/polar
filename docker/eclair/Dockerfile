@@ -56,9 +56,7 @@ RUN cp /usr/repo/pom.xml pom.xml
 RUN mkdir -p eclair-core && cp /usr/repo/eclair-core/pom.xml eclair-core/pom.xml
 RUN mkdir -p eclair-front && cp /usr/repo/eclair-front/pom.xml eclair-front/pom.xml
 RUN mkdir -p eclair-node && cp /usr/repo/eclair-node/pom.xml eclair-node/pom.xml
-RUN mkdir -p eclair-node-gui && cp /usr/repo/eclair-node-gui/pom.xml eclair-node-gui/pom.xml
 RUN mkdir -p eclair-node/modules && cp /usr/repo/eclair-node/modules/assembly.xml eclair-node/modules/assembly.xml
-RUN mkdir -p eclair-node-gui/modules && cp /usr/repo/eclair-node-gui/modules/assembly.xml eclair-node-gui/modules/assembly.xml
 RUN mkdir -p eclair-core/src/main/scala && touch eclair-core/src/main/scala/empty.scala
 # Blank build. We only care about eclair-node, and we use install because eclair-node depends on eclair-core
 ENV MAVEN_OPTS=-Xmx256m -XX:MaxPermSize=512m
