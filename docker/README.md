@@ -55,6 +55,9 @@ $ docker push polarlightning/bitcoind:<version>
 ```sh
 $ cd lnd
 $ docker build --build-arg LND_VERSION=<version> -t polarlightning/lnd:<version> .
+
+# ob-lnd I host at aliyun registry.cn-beijing.aliyuncs.com
+docker build --build-arg LND_VERSION=0.0.1 -t registry.cn-beijing.aliyuncs.com/omnicore/lnd:0.0.2 .
 ```
 
 Replace `<version>` with the desired LND version (ex: `0.7.1-beta`)

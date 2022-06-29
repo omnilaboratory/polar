@@ -19,7 +19,7 @@ if [ $(echo "$1" | cut -c1) = "-" ]; then
   set -- lnd "$@"
 fi
 
-if [ "$1" = "lnd" ] || [ "$1" = "lncli" ]; then
+if [ "$1" = "lnd-debug" ] || [ "$1" = "lncli-debug" ]; then
   echo "Running as lnd user: $@"
   exec gosu lnd "$@"
 fi
