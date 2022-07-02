@@ -72,6 +72,8 @@ const NewNetwork: React.SFC = () => {
             clightningNodes: isWindows() ? 0 : 1,
             eclairNodes: 1,
             bitcoindNodes: 1,
+            obdNodes: isWindows() ? 2 : 1,
+            omnicoredNodes: 1,
             customNodes: initialCustomValues,
           }}
           onFinish={handleSubmit}
@@ -137,7 +139,25 @@ const NewNetwork: React.SFC = () => {
                 label={dockerConfigs.bitcoind.name}
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
-                <InputNumber min={1} max={10} />
+                <InputNumber min={0} max={10} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="obdNodes"
+                label={dockerConfigs.obd.name}
+                rules={[{ required: true, message: l('cmps.forms.required') }]}
+              >
+                <InputNumber min={0} max={10} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="omnicoredNodes"
+                label={dockerConfigs.omnicored.name}
+                rules={[{ required: true, message: l('cmps.forms.required') }]}
+              >
+                <InputNumber min={0} max={10} />
               </Form.Item>
             </Col>
           </Row>

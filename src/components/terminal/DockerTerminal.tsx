@@ -68,6 +68,10 @@ const nodeConfig: Record<string, { user: string; alias: string }> = {
     user: 'lnd',
     alias: 'alias lncli="lncli --network regtest"',
   },
+  obd: {
+    user: 'lnd',
+    alias: 'alias lncli="lncli --network regtest"',
+  },
   'c-lightning': {
     user: 'clightning',
     alias: 'alias lightning-cli="lightning-cli --network regtest"',
@@ -77,6 +81,10 @@ const nodeConfig: Record<string, { user: string; alias: string }> = {
     alias: `alias eclair-cli="eclair-cli -p ${eclairCredentials.pass}"`,
   },
   bitcoind: {
+    user: 'bitcoin',
+    alias: 'alias bitcoin-cli="bitcoin-cli -regtest"',
+  },
+  omnicored: {
     user: 'bitcoin',
     alias: 'alias bitcoin-cli="bitcoin-cli -regtest"',
   },
@@ -187,7 +195,7 @@ const DockerTerminal: React.FC = () => {
       try {
         await connectStreams(term, name, type, l);
         term.focus();
-      } catch (error) {
+      } catch (error: any) {
         notify({ message: l('connectErr'), error });
       }
     };

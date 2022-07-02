@@ -41,7 +41,9 @@ const groupNodes = (network: Network) => {
   const { bitcoin, lightning } = network.nodes;
   return {
     bitcoind: bitcoin.filter(n => n.implementation === 'bitcoind') as BitcoinNode[],
+    omnicored: bitcoin.filter(n => n.implementation === 'omnicored') as BitcoinNode[],
     lnd: lightning.filter(n => n.implementation === 'LND') as LndNode[],
+    obd: lightning.filter(n => n.implementation === 'obd') as LndNode[],
     clightning: lightning.filter(
       n => n.implementation === 'c-lightning',
     ) as CLightningNode[],
@@ -82,6 +84,25 @@ export const getLndFilePaths = (name: string, network: Network) => {
     adminMacaroon: lndMacaroonPath(name, 'admin'),
     invoiceMacaroon: lndMacaroonPath(name, 'invoice'),
     readonlyMacaroon: lndMacaroonPath(name, 'readonly'),
+  };
+};
+
+export const getObdFilePaths = (name: string, network: Network) => {
+  // returns /volumes/lnd/lnd-1
+  const obdDataPath = (name: string) => nodePath(network, 'obd', name);
+  // returns /volumes/lnd/lnd-1/tls.cert
+  const obdCertPath = (name: string) => join(obdDataPath(name), 'tls.cert');
+  // returns /data/chain/bitcoin/regtest
+  const macaroonPath = join('data', 'chain', 'bitcoin', 'regtest');
+  // returns /volumes/lnd/lnd-1/data/chain/bitcoin/regtest/admin.macaroon
+  const obdMacaroonPath = (name: string, macaroon: string) =>
+    join(obdDataPath(name), macaroonPath, `${macaroon}.macaroon`);
+
+  return {
+    tlsCert: obdCertPath(name),
+    adminMacaroon: obdMacaroonPath(name, 'admin'),
+    invoiceMacaroon: obdMacaroonPath(name, 'invoice'),
+    readonlyMacaroon: obdMacaroonPath(name, 'readonly'),
   };
 };
 
@@ -144,6 +165,43 @@ export const createLndNetworkNode = (
       rest: BasePorts.LND.rest + id,
       grpc: BasePorts.LND.grpc + id,
       p2p: BasePorts.LND.p2p + id,
+    },
+    docker,
+  };
+};
+
+export const createObdNetworkNode = (
+  network: Network,
+  version: string,
+  compatibility: DockerRepoImage['compatibility'],
+  docker: CommonNode['docker'],
+  status = Status.Stopped,
+): LndNode => {
+  const { bitcoin, lightning } = network.nodes;
+  const implementation: LndNode['implementation'] = 'obd';
+  const backends = filterCompatibleBackends(
+    implementation,
+    version,
+    compatibility,
+    bitcoin,
+  );
+  const id = lightning.length ? Math.max(...lightning.map(n => n.id)) + 1 : 0;
+  const name = getName(id);
+  return {
+    id,
+    networkId: network.id,
+    name: name,
+    type: 'lightning',
+    implementation,
+    version,
+    status,
+    // alternate between backend nodes
+    backendName: backends[id % backends.length].name,
+    paths: getObdFilePaths(name, network),
+    ports: {
+      rest: BasePorts.obd.rest + id,
+      grpc: BasePorts.obd.grpc + id,
+      p2p: BasePorts.obd.p2p + id,
     },
     docker,
   };
@@ -258,13 +316,53 @@ export const createBitcoindNetworkNode = (
   return node;
 };
 
+export const createOmnicoredNetworkNode = (
+  network: Network,
+  version: string,
+  docker: CommonNode['docker'],
+  status = Status.Stopped,
+): BitcoinNode => {
+  const { bitcoin } = network.nodes;
+  const id = bitcoin.length ? Math.max(...bitcoin.map(n => n.id)) + 1 : 0;
+
+  const name = `omnicored${id + 1}`;
+  const node: BitcoinNode = {
+    id,
+    networkId: network.id,
+    name: name,
+    type: 'bitcoin',
+    implementation: 'omnicored',
+    version,
+    peers: [],
+    status,
+    ports: {
+      rpc: BasePorts.omnicored.rest + id,
+      p2p: BasePorts.omnicored.p2p + id,
+      zmqBlock: BasePorts.omnicored.zmqBlock + id,
+      zmqTx: BasePorts.omnicored.zmqTx + id,
+    },
+    docker,
+  };
+
+  // peer up with the previous node on both sides
+  if (bitcoin.length > 0) {
+    const prev = bitcoin[bitcoin.length - 1];
+    node.peers.push(prev.name);
+    prev.peers.push(node.name);
+  }
+
+  return node;
+};
+
 export const createNetwork = (config: {
   id: number;
   name: string;
   lndNodes: number;
+  obdNodes: number;
   clightningNodes: number;
   eclairNodes: number;
   bitcoindNodes: number;
+  omnicoredNodes: number;
   repoState: DockerRepoState;
   managedImages: ManagedImage[];
   customImages: { image: CustomImage; count: number }[];
@@ -274,9 +372,11 @@ export const createNetwork = (config: {
     id,
     name,
     lndNodes,
+    obdNodes,
     clightningNodes,
     eclairNodes,
     bitcoindNodes,
+    omnicoredNodes,
     repoState,
     managedImages,
     customImages,
@@ -320,15 +420,39 @@ export const createNetwork = (config: {
     bitcoin.push(createBitcoindNetworkNode(network, version, dockerWrap(cmd), status));
   });
 
+  // add custom omnicored nodes
+  customImages
+    .filter(i => i.image.implementation === 'omnicored')
+    .forEach(i => {
+      const version = repoState.images.omnicored.latest;
+      const docker = { image: i.image.dockerImage, command: i.image.command };
+      range(i.count).forEach(() => {
+        bitcoin.push(createOmnicoredNetworkNode(network, version, docker, status));
+      });
+    });
+
+  // add managed omnicored nodes
+  range(omnicoredNodes).forEach(() => {
+    let version = repoState.images.omnicored.latest;
+    if (obdNodes > 0) {
+      const compat = repoState.images.obd.compatibility as Record<string, string>;
+      version = compat[repoState.images.obd.latest];
+    }
+    const cmd = getImageCommand(managedImages, 'omnicored', version);
+    bitcoin.push(createOmnicoredNetworkNode(network, version, dockerWrap(cmd), status));
+  });
+
   // add custom lightning nodes
   customImages
-    .filter(i => ['LND', 'c-lightning', 'eclair'].includes(i.image.implementation))
+    .filter(i => ['LND', 'c-lightning', 'eclair', 'obd'].includes(i.image.implementation))
     .forEach(({ image, count }) => {
       const { latest, compatibility } = repoState.images.LND;
       const docker = { image: image.dockerImage, command: image.command };
       const createFunc =
         image.implementation === 'LND'
           ? createLndNetworkNode
+          : image.implementation === 'obd'
+          ? createObdNetworkNode
           : image.implementation === 'c-lightning'
           ? createCLightningNetworkNode
           : createEclairNetworkNode;
@@ -338,12 +462,19 @@ export const createNetwork = (config: {
     });
 
   // add lightning nodes in an alternating pattern
-  range(Math.max(lndNodes, clightningNodes, eclairNodes)).forEach(i => {
+  range(Math.max(lndNodes, obdNodes, clightningNodes, eclairNodes)).forEach(i => {
     if (i < lndNodes) {
       const { latest, compatibility } = repoState.images.LND;
       const cmd = getImageCommand(managedImages, 'LND', latest);
       lightning.push(
         createLndNetworkNode(network, latest, compatibility, dockerWrap(cmd), status),
+      );
+    }
+    if (i < obdNodes) {
+      const { latest, compatibility } = repoState.images.obd;
+      const cmd = getImageCommand(managedImages, 'obd', latest);
+      lightning.push(
+        createObdNetworkNode(network, latest, compatibility, dockerWrap(cmd), status),
       );
     }
     if (i < clightningNodes) {
@@ -484,7 +615,7 @@ export const getOpenPorts = async (network: Network): Promise<OpenPorts | undefi
     }
   }
 
-  let { lnd, clightning, eclair } = groupNodes(network);
+  let { lnd, obd, clightning, eclair } = groupNodes(network);
 
   // filter out nodes that are already started since their ports are in use by themselves
   lnd = lnd.filter(n => n.status !== Status.Started);
@@ -509,6 +640,39 @@ export const getOpenPorts = async (network: Network): Promise<OpenPorts | undefi
     }
 
     existingPorts = lnd.map(n => n.ports.p2p);
+    openPorts = await getOpenPortRange(existingPorts);
+    if (openPorts.join() !== existingPorts.join()) {
+      openPorts.forEach((port, index) => {
+        ports[lnd[index].name] = {
+          ...(ports[lnd[index].name] || {}),
+          p2p: port,
+        };
+      });
+    }
+  }
+
+  obd = obd.filter(n => n.status !== Status.Started);
+  if (obd.length) {
+    let existingPorts = obd.map(n => n.ports.grpc);
+    let openPorts = await getOpenPortRange(existingPorts);
+    if (openPorts.join() !== existingPorts.join()) {
+      openPorts.forEach((port, index) => {
+        ports[lnd[index].name] = { grpc: port };
+      });
+    }
+
+    existingPorts = obd.map(n => n.ports.rest);
+    openPorts = await getOpenPortRange(existingPorts);
+    if (openPorts.join() !== existingPorts.join()) {
+      openPorts.forEach((port, index) => {
+        ports[lnd[index].name] = {
+          ...(ports[lnd[index].name] || {}),
+          rest: port,
+        };
+      });
+    }
+
+    existingPorts = obd.map(n => n.ports.p2p);
     openPorts = await getOpenPortRange(existingPorts);
     if (openPorts.join() !== existingPorts.join()) {
       openPorts.forEach((port, index) => {
@@ -636,6 +800,9 @@ export const importNetworkFromZip = async (
     if (ln.implementation === 'LND') {
       const lnd = ln as LndNode;
       lnd.paths = getLndFilePaths(lnd.name, network);
+    } else if (ln.implementation === 'obd') {
+      const obd = ln as LndNode;
+      obd.paths = getObdFilePaths(obd.name, network);
     } else if (ln.implementation === 'c-lightning') {
       const cln = ln as CLightningNode;
       cln.paths = getCLightningFilePaths(cln.name, network);

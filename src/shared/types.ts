@@ -22,7 +22,7 @@ export interface CommonNode {
 
 export interface LightningNode extends CommonNode {
   type: 'lightning';
-  implementation: 'LND' | 'c-lightning' | 'eclair';
+  implementation: 'LND' | 'c-lightning' | 'eclair' | 'obd';
   backendName: string;
   ports: Record<string, number | undefined>;
 }
@@ -60,7 +60,7 @@ export interface EclairNode extends LightningNode {
 
 export interface BitcoinNode extends CommonNode {
   type: 'bitcoin';
-  implementation: 'bitcoind' | 'btcd';
+  implementation: 'bitcoind' | 'btcd' | 'omnicored';
   peers: string[];
   ports: {
     rpc: number;
@@ -79,4 +79,6 @@ export interface OpenChannelOptions {
   toRpcUrl: string;
   amount: string;
   isPrivate: boolean;
+  assetId: number;
+  assetAmount: string;
 }

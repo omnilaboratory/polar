@@ -21,6 +21,8 @@ import {
   createEclairNetworkNode,
   createLndNetworkNode,
   createNetwork,
+  createObdNetworkNode,
+  createOmnicoredNetworkNode,
   filterCompatibleBackends,
   getMissingImages,
   getOpenPorts,
@@ -37,9 +39,11 @@ const { l } = prefixTranslation('store.models.network');
 interface AddNetworkArgs {
   name: string;
   lndNodes: number;
+  obdNodes: number;
   clightningNodes: number;
   eclairNodes: number;
   bitcoindNodes: number;
+  omnicoredNodes: number;
   customNodes: Record<string, number>;
 }
 
@@ -201,7 +205,16 @@ const networkModel: NetworkModel = {
   addNetwork: thunk(
     async (
       actions,
-      { name, lndNodes, clightningNodes, eclairNodes, bitcoindNodes, customNodes },
+      {
+        name,
+        lndNodes,
+        obdNodes,
+        clightningNodes,
+        eclairNodes,
+        bitcoindNodes,
+        omnicoredNodes,
+        customNodes,
+      },
       { dispatch, getState, injections, getStoreState, getStoreActions },
     ) => {
       const { dockerRepoState, computedManagedImages, settings } = getStoreState().app;
@@ -219,9 +232,11 @@ const networkModel: NetworkModel = {
         id: nextId,
         name,
         lndNodes,
+        obdNodes,
         clightningNodes,
         eclairNodes,
         bitcoindNodes,
+        omnicoredNodes,
         repoState: dockerRepoState,
         managedImages: computedManagedImages,
         customImages,
@@ -272,6 +287,15 @@ const networkModel: NetworkModel = {
           );
           network.nodes.lightning.push(node);
           break;
+        case 'obd':
+          node = createObdNetworkNode(
+            network,
+            version,
+            dockerRepoState.images.obd.compatibility,
+            docker,
+          );
+          network.nodes.lightning.push(node);
+          break;
         case 'c-lightning':
           node = createCLightningNetworkNode(
             network,
@@ -292,6 +316,10 @@ const networkModel: NetworkModel = {
           break;
         case 'bitcoind':
           node = createBitcoindNetworkNode(network, version, docker);
+          network.nodes.bitcoin.push(node);
+          break;
+        case 'omnicored':
+          node = createOmnicoredNetworkNode(network, version, docker);
           network.nodes.bitcoin.push(node);
           break;
         default:
@@ -336,6 +364,7 @@ const networkModel: NetworkModel = {
       await injections.dockerService.saveComposeFile(network);
       // clear cached RPC data
       if (node.implementation === 'LND') getStoreActions().app.clearAppCache();
+      if (node.implementation === 'obd') getStoreActions().app.clearAppCache();
       // remove the node from the chart's redux state
       getStoreActions().designer.removeNode(node.name);
       // update the network in the redux state and save to disk
@@ -530,7 +559,7 @@ const networkModel: NetworkModel = {
           ...network.nodes.lightning,
           ...network.nodes.bitcoin,
         ]);
-      } catch (e) {
+      } catch (e: any) {
         actions.setStatus({ id, status: Status.Error });
         info(`unable to start network '${network.name}'`, e.message);
         throw e;
@@ -544,7 +573,7 @@ const networkModel: NetworkModel = {
     try {
       await injections.dockerService.stop(network);
       actions.setStatus({ id: network.id, status: Status.Stopped });
-    } catch (e) {
+    } catch (e: any) {
       actions.setStatus({ id: network.id, status: Status.Error });
       info(`unable to stop network '${network.name}'`, e.message);
       throw e;

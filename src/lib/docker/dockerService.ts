@@ -36,7 +36,7 @@ class DockerService implements DockerLibrary {
       const dockerVersion = await new Dockerode().version();
       debug(`Result: ${JSON.stringify(dockerVersion)}`);
       versions.docker = dockerVersion.Version;
-    } catch (error) {
+    } catch (error: any) {
       debug(`Failed: ${error.message}`);
       if (throwOnError) throw error;
     }
@@ -46,7 +46,7 @@ class DockerService implements DockerLibrary {
       const composeVersion = await this.execute(compose.version, this.getArgs());
       debug(`Result: ${JSON.stringify(composeVersion)}`);
       versions.compose = composeVersion.out.trim();
-    } catch (error) {
+    } catch (error: any) {
       debug(`Failed: ${error.message}`);
       if (throwOnError) throw error;
     }
@@ -70,7 +70,7 @@ class DockerService implements DockerLibrary {
       );
       debug(`Image Names: ${JSON.stringify(uniqueNames)}`);
       return uniqueNames;
-    } catch (error) {
+    } catch (error: any) {
       debug(`Failed: ${error.message}`);
       return [];
     }
@@ -84,12 +84,25 @@ class DockerService implements DockerLibrary {
     const file = new ComposeFile();
     const { bitcoin, lightning } = network.nodes;
 
-    bitcoin.forEach(node => file.addBitcoind(node));
+    // bitcoin.forEach(node => file.addBitcoind(node));
+    bitcoin.forEach(node => {
+      if (node.implementation === 'bitcoind') {
+        file.addBitcoind(node);
+      }
+      if (node.implementation === 'omnicored') {
+        file.addOmnicored(node);
+      }
+    });
     lightning.forEach(node => {
       if (node.implementation === 'LND') {
         const lnd = node as LndNode;
         const backend = bitcoin.find(n => n.name === lnd.backendName) || bitcoin[0];
         file.addLnd(lnd, backend);
+      }
+      if (node.implementation === 'obd') {
+        const obd = node as LndNode;
+        const backend = bitcoin.find(n => n.name === obd.backendName) || bitcoin[0];
+        file.addObd(obd, backend);
       }
       if (node.implementation === 'c-lightning') {
         const cln = node as CLightningNode;
@@ -248,7 +261,7 @@ class DockerService implements DockerLibrary {
       result.out = stripAnsi(result.out);
       result.err = stripAnsi(result.err);
       return result;
-    } catch (e) {
+    } catch (e: any) {
       e.err = stripAnsi(e.err);
       info(`docker cmd failed: ${JSON.stringify(e)}`);
       throw new Error(e.err || JSON.stringify(e));

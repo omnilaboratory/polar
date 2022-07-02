@@ -137,7 +137,7 @@ export interface LightningService {
     node: LightningNode,
     backend?: BitcoinNode,
   ) => Promise<PLN.LightningNodeBalances>;
-  getNewAddress: (node: LightningNode) => Promise<PLN.LightningNodeAddress>;
+  getNewAddress: (node: LightningNode, type: number) => Promise<PLN.LightningNodeAddress>;
   getChannels: (node: LightningNode) => Promise<PLN.LightningNodeChannel[]>;
   getPeers: (node: LightningNode) => Promise<PLN.LightningNodePeer[]>;
   connectPeers: (node: LightningNode, rpcUrls: string[]) => Promise<void>;

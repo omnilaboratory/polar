@@ -18,8 +18,11 @@ class LndProxyClient {
     return await this.ipc(ipcChannels.walletBalance, { node });
   }
 
-  async getNewAddress(node: LndNode): Promise<LND.NewAddressResponse> {
-    return await this.ipc(ipcChannels.newAddress, { node });
+  async getNewAddress(
+    node: LndNode,
+    req: LND.NewAddressRequest,
+  ): Promise<LND.NewAddressResponse> {
+    return await this.ipc(ipcChannels.newAddress, { node, req });
   }
 
   async listPeers(node: LndNode): Promise<LND.ListPeersResponse> {

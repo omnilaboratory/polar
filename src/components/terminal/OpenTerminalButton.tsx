@@ -36,10 +36,16 @@ const OpenTerminalButton: React.FC<Props> = ({ node, type }) => {
     case 'LND':
       cmd = 'lncli';
       break;
+    case 'obd':
+      cmd = 'lncli';
+      break;
     case 'c-lightning':
       cmd = 'lightning-cli';
       break;
     case 'bitcoind':
+      cmd = 'bitcoin-cli';
+      break;
+    case 'omnicored':
       cmd = 'bitcoin-cli';
       break;
   }

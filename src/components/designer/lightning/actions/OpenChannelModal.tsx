@@ -40,7 +40,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
     try {
       await openChannel(payload);
       hideOpenChannel();
-    } catch (error) {
+    } catch (error: any) {
       notify({ message: l('submitError'), error });
     }
   });
@@ -66,6 +66,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
     to: string;
     from: string;
     sats: string;
+    assetSats: string;
   }) => {
     const { lightning } = network.nodes;
     const fromNode = lightning.find(n => n.name === values.from);
@@ -78,6 +79,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
       sats: values.sats,
       autoFund,
       isPrivate: values.isPrivate,
+      assetSats: values.assetSats,
     });
   };
 
@@ -87,7 +89,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
       layout="vertical"
       hideRequiredMark
       colon={false}
-      initialValues={{ from, to, sats: 250000, autoFund: true }}
+      initialValues={{ from, to, sats: 250000, autoFund: true, assetSats: 250000 }}
       onFinish={handleSubmit}
     >
       {sameNode && <Alert type="error" message={l('sameNodesWarnMsg')} />}
@@ -120,6 +122,19 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
       <Form.Item
         name="sats"
         label={l('capacityLabel') + ' (sats)'}
+        rules={[{ required: true, message: l('cmps.forms.required') }]}
+      >
+        <InputNumber<number>
+          disabled={openChanAsync.loading}
+          formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+          parser={v => parseInt(`${v}`.replace(/(undefined|,*)/g, ''))}
+          style={{ width: '100%' }}
+          onChange={v => setSelectedSats(v as number)}
+        />
+      </Form.Item>
+      <Form.Item
+        name="assetSats"
+        label={'asset ' + l('capacityLabel') + ' (sats)'}
         rules={[{ required: true, message: l('cmps.forms.required') }]}
       >
         <InputNumber<number>

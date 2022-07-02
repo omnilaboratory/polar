@@ -19,7 +19,7 @@ const Sidebar: React.FC<Props> = ({ network, chart }) => {
     if (type === 'node') {
       const { bitcoin, lightning } = network.nodes;
       const node = bitcoin.find(n => n.name === id) || lightning.find(n => n.name === id);
-      if (node && node.implementation === 'bitcoind') {
+      if (node && node.type === 'bitcoin') {
         return <BitcoindDetails node={node} />;
       } else if (node && node.type === 'lightning') {
         return <LightningDetails node={node as LightningNode} />;

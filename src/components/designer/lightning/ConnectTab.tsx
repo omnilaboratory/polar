@@ -79,6 +79,22 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
           p2pUriExternal: `${pubkey}@127.0.0.1:${lnd.ports.p2p}`,
           authTypes: ['paths', 'hex', 'base64', 'lndc'],
         };
+      } else if (node.implementation === 'obd') {
+        const obd = node as LndNode;
+        return {
+          restUrl: `https://127.0.0.1:${obd.ports.rest}`,
+          restDocsUrl: 'https://api.lightning.community/#lnd-rest-api-reference',
+          grpcUrl: `127.0.0.1:${obd.ports.grpc}`,
+          grpcDocsUrl: 'https://api.lightning.community/',
+          credentials: {
+            admin: obd.paths.adminMacaroon,
+            readOnly: obd.paths.readonlyMacaroon,
+            invoice: obd.paths.invoiceMacaroon,
+            cert: obd.paths.tlsCert,
+          },
+          p2pUriExternal: `${pubkey}@127.0.0.1:${obd.ports.p2p}`,
+          authTypes: ['paths', 'hex', 'base64', 'lndc'],
+        };
       } else if (node.implementation === 'c-lightning') {
         const cln = node as CLightningNode;
         return {
@@ -164,7 +180,9 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
     paths: <FilePaths credentials={credentials} />,
     hex: <EncodedStrings credentials={credentials} encoding="hex" />,
     base64: <EncodedStrings credentials={credentials} encoding="base64" />,
-    lndc: node.implementation === 'LND' && <LndConnect node={node as LndNode} />,
+    lndc: (node.implementation === 'LND' || node.implementation === 'obd') && (
+      <LndConnect node={node as LndNode} />
+    ),
     basic: credentials.basicAuth && <BasicAuth password={credentials.basicAuth} />,
   };
 
@@ -188,7 +206,7 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
             {l('base64Strings')}
           </Radio.Button>,
         ]}
-        {node.implementation === 'LND' && (
+        {(node.implementation === 'LND' || node.implementation === 'obd') && (
           <Radio.Button value="lndc">{l('lndConnect')}</Radio.Button>
         )}
         {credentials.basicAuth && (

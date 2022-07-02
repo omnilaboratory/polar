@@ -86,6 +86,10 @@ export const testRepoState: DockerRepoState = {
         '0.7.1-beta': '0.18.1',
       },
     },
+    obd: {
+      latest: '0.0.2',
+      versions: ['0.0.2'],
+    },
     'c-lightning': {
       latest: '0.10.0',
       versions: ['0.10.0', '0.9.3', '0.9.2', '0.9.1', '0.9.0', '0.8.2', '0.8.1', '0.8.0'],
@@ -97,6 +101,10 @@ export const testRepoState: DockerRepoState = {
     bitcoind: {
       latest: '0.21.1',
       versions: ['0.21.1', '0.21.0', '0.20.1', '0.20.0', '0.19.1', '0.19.0.1', '0.18.1'],
+    },
+    omnicored: {
+      latest: '0.0.2',
+      versions: ['0.0.2'],
     },
     btcd: {
       latest: '',
@@ -110,9 +118,11 @@ export const getNetwork = (networkId = 1, name?: string, status?: Status): Netwo
     id: networkId,
     name: name || 'my-test',
     lndNodes: 2,
+    obdNodes: 2,
     clightningNodes: 1,
     eclairNodes: 1,
     bitcoindNodes: 1,
+    omnicoredNodes: 1,
     status,
     repoState: defaultRepoState,
     managedImages: testManagedImages,

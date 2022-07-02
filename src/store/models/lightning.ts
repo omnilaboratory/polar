@@ -1,3 +1,4 @@
+import { AddressType } from '@radar/lnrpc';
 import { Action, action, Thunk, thunk, ThunkOn, thunkOn } from 'easy-peasy';
 import { LightningNode, Status } from 'shared/types';
 import * as PLN from 'lib/lightning/types';
@@ -28,6 +29,7 @@ export interface OpenChannelPayload {
   sats: string;
   autoFund: boolean;
   isPrivate: boolean;
+  assetSats: string;
 }
 
 export interface CreateInvoicePayload {
@@ -162,7 +164,10 @@ const lightningModel: LightningModel = {
       const { nodes } = getStoreState().network.networkById(node.networkId);
       const btcNode = nodes.bitcoin[0];
       const api = injections.lightningFactory.getService(node);
-      const { address } = await api.getNewAddress(node);
+      const { address } = await api.getNewAddress(
+        node,
+        AddressType.UNUSED_WITNESS_PUBKEY_HASH,
+      );
       const coins = fromSatsNumeric(sats);
       await injections.bitcoindService.sendFunds(btcNode, address, coins);
       await getStoreActions().bitcoind.mine({
@@ -177,7 +182,7 @@ const lightningModel: LightningModel = {
   openChannel: thunk(
     async (
       actions,
-      { from, to, sats, autoFund, isPrivate },
+      { from, to, sats, autoFund, isPrivate, assetSats },
       { injections, getStoreState, getStoreActions },
     ) => {
       // automatically deposit funds when the node doesn't have enough to open the channel
@@ -193,7 +198,14 @@ const lightningModel: LightningModel = {
         .info as PLN.LightningNodeInfo;
       // open the channel via lightning node
       const api = injections.lightningFactory.getService(from);
-      await api.openChannel({ from, toRpcUrl: rpcUrl, amount: sats, isPrivate });
+      await api.openChannel({
+        from,
+        toRpcUrl: rpcUrl,
+        amount: sats,
+        isPrivate,
+        assetId: 2147483651,
+        assetAmount: assetSats,
+      });
       // wait for the unconfirmed tx to be processed by the bitcoin node
       await delay(500);
       // mine some blocks to confirm the txn
@@ -262,6 +274,7 @@ const lightningModel: LightningModel = {
       LND: 1,
       'c-lightning': 2,
       eclair: 2,
+      obd: 1,
     };
     // determine the highest delay of all implementations
     const longestDelay = nodes.reduce(
@@ -283,7 +296,7 @@ const lightningModel: LightningModel = {
           .map(async n => {
             try {
               await actions.getAllInfo(n);
-            } catch (error) {
+            } catch (error: any) {
               notify({ message: `Unable to retrieve node info from ${n.name}`, error });
             }
           }),

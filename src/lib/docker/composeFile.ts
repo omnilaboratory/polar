@@ -7,7 +7,7 @@ import {
 } from 'shared/types';
 import { bitcoinCredentials, dockerConfigs, eclairCredentials } from 'utils/constants';
 import { getContainerName } from 'utils/network';
-import { bitcoind, clightning, eclair, lnd } from './nodeTemplates';
+import { bitcoind, clightning, eclair, lnd, obd, omnicored } from './nodeTemplates';
 
 export interface ComposeService {
   image: string;
@@ -66,6 +66,34 @@ class ComposeFile {
     );
   }
 
+  addOmnicored(node: BitcoinNode) {
+    const { name, version, ports } = node;
+    const { rpc, p2p, zmqBlock, zmqTx } = ports;
+    const container = getContainerName(node);
+    // define the variable substitutions
+    const variables = {
+      rpcUser: bitcoinCredentials.user,
+      rpcAuth: bitcoinCredentials.rpcauth,
+    };
+    // use the node's custom image or the default for the implementation
+    const image = node.docker.image || `${dockerConfigs.omnicored.imageName}:${version}`;
+    // use the node's custom command or the default for the implementation
+    const nodeCommand = node.docker.command || dockerConfigs.omnicored.command;
+    // replace the variables in the command
+    const command = this.mergeCommand(nodeCommand, variables);
+    // add the docker service
+    this.content.services[name] = omnicored(
+      name,
+      container,
+      image,
+      rpc,
+      // p2p,
+      zmqBlock,
+      zmqTx,
+      command,
+    );
+  }
+
   addLnd(node: LndNode, backend: CommonNode) {
     const { name, version, ports } = node;
     const { rest, grpc, p2p } = ports;
@@ -86,6 +114,28 @@ class ComposeFile {
     const command = this.mergeCommand(nodeCommand, variables);
     // add the docker service
     this.content.services[name] = lnd(name, container, image, rest, grpc, p2p, command);
+  }
+
+  addObd(node: LndNode, backend: CommonNode) {
+    const { name, version, ports } = node;
+    const { rest, grpc, p2p } = ports;
+    const container = getContainerName(node);
+    // define the variable substitutions
+    const variables = {
+      name: node.name,
+      containerName: container,
+      backendName: getContainerName(backend),
+      rpcUser: bitcoinCredentials.user,
+      rpcPass: bitcoinCredentials.pass,
+    };
+    // use the node's custom image or the default for the implementation
+    const image = node.docker.image || `${dockerConfigs.obd.imageName}:${version}`;
+    // use the node's custom command or the default for the implementation
+    const nodeCommand = node.docker.command || dockerConfigs.obd.command;
+    // replace the variables in the command
+    const command = this.mergeCommand(nodeCommand, variables);
+    // add the docker service
+    this.content.services[name] = obd(name, container, image, rest, grpc, p2p, command);
   }
 
   addClightning(node: CLightningNode, backend: CommonNode) {

@@ -31,8 +31,14 @@ class LndService implements LightningService {
     };
   }
 
-  async getNewAddress(node: LightningNode): Promise<PLN.LightningNodeAddress> {
-    return await proxy.getNewAddress(this.cast(node));
+  async getNewAddress(
+    node: LightningNode,
+    addressType: number,
+  ): Promise<PLN.LightningNodeAddress> {
+    const req: LND.NewAddressRequest = {
+      type: addressType,
+    };
+    return await proxy.getNewAddress(this.cast(node), req);
   }
 
   async getChannels(node: LightningNode): Promise<PLN.LightningNodeChannel[]> {
@@ -72,7 +78,7 @@ class LndService implements LightningService {
         const [toPubKey, host] = toRpcUrl.split('@');
         const addr: LND.LightningAddress = { pubkey: toPubKey, host };
         await proxy.connectPeer(this.cast(node), { addr });
-      } catch (error) {
+      } catch (error: any) {
         debug(
           `Failed to connect peer '${toRpcUrl}' to LND node ${node.name}:`,
           error.message,
@@ -86,6 +92,8 @@ class LndService implements LightningService {
     toRpcUrl,
     amount,
     isPrivate,
+    assetId,
+    assetAmount,
   }: OpenChannelOptions): Promise<PLN.LightningNodeChannelPoint> {
     const lndFrom = this.cast(from);
 
@@ -97,8 +105,10 @@ class LndService implements LightningService {
     // open channel
     const req: LND.OpenChannelRequest = {
       nodePubkeyString: toPubKey,
-      localFundingAmount: amount,
+      localFundingBtcAmount: amount,
       private: isPrivate,
+      assetId: assetId,
+      localFundingAssetAmount: assetAmount,
     };
     const res = await proxy.openChannel(lndFrom, req);
     return {
@@ -173,8 +183,8 @@ class LndService implements LightningService {
   }
 
   private cast(node: LightningNode): LndNode {
-    if (node.implementation !== 'LND')
-      throw new Error(`LndService cannot be used for '${node.implementation}' nodes`);
+    // if (node.implementation !== 'LND')
+    //   throw new Error(`LndService cannot be used for '${node.implementation}' nodes`);
 
     return node as LndNode;
   }

@@ -43,9 +43,12 @@ const walletBalance = async (args: {
   return await rpc.walletBalance();
 };
 
-const newAddress = async (args: { node: LndNode }): Promise<LND.NewAddressResponse> => {
+const newAddress = async (args: {
+  node: LndNode;
+  req: LND.NewAddressRequest;
+}): Promise<LND.NewAddressResponse> => {
   const rpc = await getRpc(args.node);
-  return await rpc.newAddress();
+  return await rpc.newAddress(args.req);
 };
 
 const listPeers = async (args: { node: LndNode }): Promise<LND.ListPeersResponse> => {
@@ -172,7 +175,7 @@ export const initLndProxy = (ipc: IpcMain) => {
         result = withDefaults(result, channel as DefaultsKey);
         // response to the calling process with a reply
         event.reply(uniqueChan, result);
-      } catch (err) {
+      } catch (err: any) {
         // reply with an error message if the execution fails
         debug(`LndProxyServer: send error "${uniqueChan}"`, JSON.stringify(err, null, 2));
         event.reply(uniqueChan, { err: err.message });

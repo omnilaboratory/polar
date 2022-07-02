@@ -50,7 +50,18 @@ export const BasePorts: Record<NodeImplementation, Record<string, number>> = {
     zmqBlock: 28334,
     zmqTx: 29335,
   },
+  omnicored: {
+    rest: 18332,
+    p2p: 18332,
+    zmqBlock: 28332,
+    zmqTx: 28333,
+  },
   LND: {
+    rest: 8081,
+    grpc: 10001,
+    p2p: 9735,
+  },
+  obd: {
     rest: 8081,
     grpc: 10001,
     p2p: 9735,
@@ -103,6 +114,35 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
       '--bitcoind.rpcpass={{rpcPass}}',
       '--bitcoind.zmqpubrawblock=tcp://{{backendName}}:28334',
       '--bitcoind.zmqpubrawtx=tcp://{{backendName}}:28335',
+    ].join('\n  '),
+    // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
+    variables: ['name', 'containerName', 'backendName', 'rpcUser', 'rpcPass'],
+  },
+  obd: {
+    name: 'obd',
+    imageName: 'polarlightning/obd',
+    logo: lndLogo,
+    platforms: ['mac', 'linux', 'windows'],
+    volumeDirName: 'lnd',
+    command: [
+      'lnd-debug',
+      '--noseedbackup',
+      '--trickledelay=5000',
+      '--alias={{name}}',
+      '--externalip={{name}}',
+      '--tlsextradomain={{name}}',
+      '--tlsextradomain={{containerName}}',
+      '--listen=0.0.0.0:9735',
+      '--rpclisten=0.0.0.0:10009',
+      '--restlisten=0.0.0.0:8080',
+      '--bitcoin.active',
+      '--bitcoin.regtest',
+      '--bitcoin.node=bitcoind',
+      '--bitcoind.rpchost={{backendName}}',
+      '--bitcoind.rpcuser={{rpcUser}}',
+      '--bitcoind.rpcpass={{rpcPass}}',
+      '--bitcoind.zmqpubrawblock=tcp://{{backendName}}:28332',
+      '--bitcoind.zmqpubrawtx=tcp://{{backendName}}:28333',
     ].join('\n  '),
     // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
     variables: ['name', 'containerName', 'backendName', 'rpcUser', 'rpcPass'],
@@ -192,6 +232,34 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
     // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
     variables: ['rpcUser', 'rpcAuth'],
   },
+  omnicored: {
+    name: 'Omni Core',
+    imageName: 'polarlightning/omnicored',
+    logo: bitcoindLogo,
+    platforms: ['mac', 'linux', 'windows'],
+    volumeDirName: 'omnicored',
+    command: [
+      '-server=1',
+      '-regtest=1',
+      '-rpcauth={{rpcUser}}:{{rpcAuth}}',
+      '-debug=1',
+      '-zmqpubrawblock=tcp://0.0.0.0:28332',
+      '-zmqpubrawtx=tcp://0.0.0.0:28333',
+      '-zmqpubhashblock=tcp://0.0.0.0:28336',
+      '-txindex=1',
+      '-dnsseed=0',
+      '-upnp=0',
+      '-rpcbind=0.0.0.0',
+      '-rpcallowip=0.0.0.0/0',
+      '-rpcport=18332',
+      '-rest',
+      '-listen=1',
+      '-listenonion=0',
+      '-fallbackfee=0.0002',
+    ].join('\n  '),
+    // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
+    variables: ['rpcUser', 'rpcAuth'],
+  },
   btcd: {
     name: 'btcd',
     imageName: '',
@@ -230,6 +298,10 @@ export const defaultRepoState: DockerRepoState = {
         '0.10.3-beta': '0.21.1',
       },
     },
+    obd: {
+      latest: '0.0.2',
+      versions: ['0.0.2'],
+    },
     'c-lightning': {
       latest: '0.10.0',
       versions: ['0.10.0', '0.9.3', '0.8.2'],
@@ -241,6 +313,10 @@ export const defaultRepoState: DockerRepoState = {
     bitcoind: {
       latest: '0.21.1',
       versions: ['0.21.1'],
+    },
+    omnicored: {
+      latest: '0.0.3',
+      versions: ['0.0.3', '0.0.2'],
     },
     btcd: {
       latest: '',

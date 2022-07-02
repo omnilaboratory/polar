@@ -4,7 +4,7 @@ import { LndNode } from 'shared/types';
 import { NetworksFile } from 'types';
 import { networksPath } from './config';
 import { APP_VERSION, BasePorts, dockerConfigs } from './constants';
-import { getLndFilePaths } from './network';
+import { getLndFilePaths, getObdFilePaths } from './network';
 
 const v020 = (file: NetworksFile): NetworksFile => {
   debug('Applying v0.2.0 migrations');
@@ -30,6 +30,12 @@ const v020 = (file: NetworksFile): NetworksFile => {
         const newPaths = getLndFilePaths(node.name, network);
         if ((node as LndNode).paths.tlsCert !== newPaths.tlsCert) {
           debug(`${pre} updated LND node paths for ${node.name}`);
+          (node as LndNode).paths = newPaths;
+        }
+      } else if (node.implementation === 'obd') {
+        const newPaths = getObdFilePaths(node.name, network);
+        if ((node as LndNode).paths.tlsCert !== newPaths.tlsCert) {
+          debug(`${pre} updated obd node paths for ${node.name}`);
           (node as LndNode).paths = newPaths;
         }
       }
@@ -101,6 +107,12 @@ const v030 = (file: NetworksFile): NetworksFile => {
           debug(`${pre} update LND logo icon for chart node ${node.name}`);
           props.icon = dockerConfigs.LND.logo;
         }
+      } else if (node.implementation === 'obd') {
+        const props = file.charts[network.id].nodes[node.name].properties;
+        if (props && props.icon !== dockerConfigs.obd.logo) {
+          debug(`${pre} update obd logo icon for chart node ${node.name}`);
+          props.icon = dockerConfigs.obd.logo;
+        }
       }
     });
   });
@@ -125,6 +137,13 @@ const v110 = (file: NetworksFile): NetworksFile => {
       if (node.implementation === 'LND' && !(node as LndNode).paths.invoiceMacaroon) {
         debug(`${pre} update LND invoice macaroon path for ${node.name}`);
         const newPaths = getLndFilePaths(node.name, network);
+        (node as LndNode).paths = newPaths;
+      } else if (
+        node.implementation === 'obd' &&
+        !(node as LndNode).paths.invoiceMacaroon
+      ) {
+        debug(`${pre} update obd invoice macaroon path for ${node.name}`);
+        const newPaths = getObdFilePaths(node.name, network);
         (node as LndNode).paths = newPaths;
       }
     });
