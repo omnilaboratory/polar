@@ -1,0 +1,52 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ResolveHoldForwardAction = exports.PaymentState = exports.FailureDetail = exports.HtlcEventType = void 0;
+var HtlcEventType;
+(function (HtlcEventType) {
+    HtlcEventType[HtlcEventType["UNKNOWN"] = 0] = "UNKNOWN";
+    HtlcEventType[HtlcEventType["SEND"] = 1] = "SEND";
+    HtlcEventType[HtlcEventType["RECEIVE"] = 2] = "RECEIVE";
+    HtlcEventType[HtlcEventType["FORWARD"] = 3] = "FORWARD";
+})(HtlcEventType = exports.HtlcEventType || (exports.HtlcEventType = {}));
+var FailureDetail;
+(function (FailureDetail) {
+    FailureDetail[FailureDetail["UNKNOWN"] = 0] = "UNKNOWN";
+    FailureDetail[FailureDetail["NO_DETAIL"] = 1] = "NO_DETAIL";
+    FailureDetail[FailureDetail["ONION_DECODE"] = 2] = "ONION_DECODE";
+    FailureDetail[FailureDetail["LINK_NOT_ELIGIBLE"] = 3] = "LINK_NOT_ELIGIBLE";
+    FailureDetail[FailureDetail["ON_CHAIN_TIMEOUT"] = 4] = "ON_CHAIN_TIMEOUT";
+    FailureDetail[FailureDetail["HTLC_EXCEEDS_MAX"] = 5] = "HTLC_EXCEEDS_MAX";
+    FailureDetail[FailureDetail["INSUFFICIENT_BALANCE"] = 6] = "INSUFFICIENT_BALANCE";
+    FailureDetail[FailureDetail["INCOMPLETE_FORWARD"] = 7] = "INCOMPLETE_FORWARD";
+    FailureDetail[FailureDetail["HTLC_ADD_FAILED"] = 8] = "HTLC_ADD_FAILED";
+    FailureDetail[FailureDetail["FORWARDS_DISABLED"] = 9] = "FORWARDS_DISABLED";
+    FailureDetail[FailureDetail["INVOICE_CANCELED"] = 10] = "INVOICE_CANCELED";
+    FailureDetail[FailureDetail["INVOICE_UNDERPAID"] = 11] = "INVOICE_UNDERPAID";
+    FailureDetail[FailureDetail["INVOICE_EXPIRY_TOO_SOON"] = 12] = "INVOICE_EXPIRY_TOO_SOON";
+    FailureDetail[FailureDetail["INVOICE_NOT_OPEN"] = 13] = "INVOICE_NOT_OPEN";
+    FailureDetail[FailureDetail["MPP_INVOICE_TIMEOUT"] = 14] = "MPP_INVOICE_TIMEOUT";
+    FailureDetail[FailureDetail["ADDRESS_MISMATCH"] = 15] = "ADDRESS_MISMATCH";
+    FailureDetail[FailureDetail["SET_TOTAL_MISMATCH"] = 16] = "SET_TOTAL_MISMATCH";
+    FailureDetail[FailureDetail["SET_TOTAL_TOO_LOW"] = 17] = "SET_TOTAL_TOO_LOW";
+    FailureDetail[FailureDetail["SET_OVERPAID"] = 18] = "SET_OVERPAID";
+    FailureDetail[FailureDetail["UNKNOWN_INVOICE"] = 19] = "UNKNOWN_INVOICE";
+    FailureDetail[FailureDetail["INVALID_KEYSEND"] = 20] = "INVALID_KEYSEND";
+    FailureDetail[FailureDetail["MPP_IN_PROGRESS"] = 21] = "MPP_IN_PROGRESS";
+    FailureDetail[FailureDetail["CIRCULAR_ROUTE"] = 22] = "CIRCULAR_ROUTE";
+})(FailureDetail = exports.FailureDetail || (exports.FailureDetail = {}));
+var PaymentState;
+(function (PaymentState) {
+    PaymentState[PaymentState["IN_FLIGHT"] = 0] = "IN_FLIGHT";
+    PaymentState[PaymentState["SUCCEEDED"] = 1] = "SUCCEEDED";
+    PaymentState[PaymentState["FAILED_TIMEOUT"] = 2] = "FAILED_TIMEOUT";
+    PaymentState[PaymentState["FAILED_NO_ROUTE"] = 3] = "FAILED_NO_ROUTE";
+    PaymentState[PaymentState["FAILED_ERROR"] = 4] = "FAILED_ERROR";
+    PaymentState[PaymentState["FAILED_INCORRECT_PAYMENT_DETAILS"] = 5] = "FAILED_INCORRECT_PAYMENT_DETAILS";
+    PaymentState[PaymentState["FAILED_INSUFFICIENT_BALANCE"] = 6] = "FAILED_INSUFFICIENT_BALANCE";
+})(PaymentState = exports.PaymentState || (exports.PaymentState = {}));
+var ResolveHoldForwardAction;
+(function (ResolveHoldForwardAction) {
+    ResolveHoldForwardAction[ResolveHoldForwardAction["SETTLE"] = 0] = "SETTLE";
+    ResolveHoldForwardAction[ResolveHoldForwardAction["FAIL"] = 1] = "FAIL";
+    ResolveHoldForwardAction[ResolveHoldForwardAction["RESUME"] = 2] = "RESUME";
+})(ResolveHoldForwardAction = exports.ResolveHoldForwardAction || (exports.ResolveHoldForwardAction = {}));

@@ -1,6 +1,6 @@
 import { IpcMain } from 'electron';
 import { debug } from 'electron-log';
-import createLndRpc, * as LND from '@radar/lnrpc';
+import createLndRpc, * as LND from '../../src/lnrpc/dist/src';
 import { DefaultsKey, ipcChannels, withDefaults } from '../../src/shared';
 import { LndNode } from '../../src/shared/types';
 
@@ -10,6 +10,10 @@ import { LndNode } from '../../src/shared/types';
  */
 let rpcCache: {
   [key: string]: LND.LnRpc;
+} = {};
+
+let rpcCache1: {
+  [key: string]: LND.RouterRpc;
 } = {};
 
 /**
@@ -29,6 +33,21 @@ const getRpc = async (node: LndNode): Promise<LND.LnRpc> => {
     rpcCache[id] = await createLndRpc(config);
   }
   return rpcCache[id];
+};
+
+const getRouterRpc = async (node: LndNode): Promise<LND.RouterRpc> => {
+  const { name, ports, paths, networkId } = node;
+  // TODO: use node unique id for caching since is an application level global variable
+  const id = `n${networkId}-${name}`;
+  if (!rpcCache1[id]) {
+    const config = {
+      server: `127.0.0.1:${ports.grpc}`,
+      tls: paths.tlsCert,
+      macaroonPath: paths.adminMacaroon,
+    };
+    rpcCache1[id] = await LND.createRouterRpc(config);
+  }
+  return rpcCache1[id];
 };
 
 const getInfo = async (args: { node: LndNode }): Promise<LND.GetInfoResponse> => {
@@ -106,10 +125,24 @@ const createInvoice = async (args: {
 
 const payInvoice = async (args: {
   node: LndNode;
-  req: LND.SendRequest;
-}): Promise<LND.SendResponse> => {
-  const rpc = await getRpc(args.node);
-  return await rpc.sendPaymentSync(args.req);
+  req: LND.SendPaymentRequest;
+}): Promise<LND.Payment> => {
+  const rpc = await getRouterRpc(args.node);
+  // return await rpc.sendPaymentSync(args.req);
+
+  return new Promise(function (resolve, reject) {
+    const res = rpc.sendPaymentV2(args.req);
+    res.on('data', payment => {
+      try {
+        // JSON.parse() can throw an exception if not valid JSON
+        res.destroy();
+        return resolve(payment);
+      } catch (e) {
+        res.destroy();
+        reject(e);
+      }
+    });
+  });
 };
 
 const decodeInvoice = async (args: {
@@ -189,4 +222,5 @@ export const initLndProxy = (ipc: IpcMain) => {
  */
 export const clearProxyCache = () => {
   rpcCache = {};
+  rpcCache1 = {};
 };

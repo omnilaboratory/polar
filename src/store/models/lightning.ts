@@ -1,4 +1,3 @@
-import { AddressType } from '@radar/lnrpc';
 import { Action, action, Thunk, thunk, ThunkOn, thunkOn } from 'easy-peasy';
 import { LightningNode, Status } from 'shared/types';
 import * as PLN from 'lib/lightning/types';
@@ -36,12 +35,14 @@ export interface CreateInvoicePayload {
   node: LightningNode;
   amount: number;
   memo?: string;
+  assetId?: number;
 }
 
 export interface PayInvoicePayload {
   node: LightningNode;
   invoice: string;
   amount?: number;
+  assetId?: number;
 }
 
 export interface LightningModel {
@@ -164,10 +165,7 @@ const lightningModel: LightningModel = {
       const { nodes } = getStoreState().network.networkById(node.networkId);
       const btcNode = nodes.bitcoin[0];
       const api = injections.lightningFactory.getService(node);
-      const { address } = await api.getNewAddress(
-        node,
-        AddressType.UNUSED_WITNESS_PUBKEY_HASH,
-      );
+      const { address } = await api.getNewAddress(node, 2);
       const coins = fromSatsNumeric(sats);
       await injections.bitcoindService.sendFunds(btcNode, address, coins);
       await getStoreActions().bitcoind.mine({
@@ -248,7 +246,7 @@ const lightningModel: LightningModel = {
   ),
   createInvoice: thunk(async (actions, { node, amount, memo }, { injections }) => {
     const api = injections.lightningFactory.getService(node);
-    return await api.createInvoice(node, amount, memo);
+    return await api.createInvoice(node, amount, memo, 2147483651);
   }),
   payInvoice: thunk(
     async (
@@ -257,7 +255,7 @@ const lightningModel: LightningModel = {
       { injections, getStoreState, getStoreActions },
     ) => {
       const api = injections.lightningFactory.getService(node);
-      const receipt = await api.payInvoice(node, invoice, amount);
+      const receipt = await api.payInvoice(node, invoice, amount, 2147483651);
 
       const network = getStoreState().network.networkById(node.networkId);
       // synchronize the chart with the new channel

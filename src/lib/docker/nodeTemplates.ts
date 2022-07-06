@@ -58,8 +58,12 @@ export const omnicored = (
   },
   hostname: name,
   command: trimInside(command),
+  // volumes: [`./volumes/${dockerConfigs.omnicored.volumeDirName}/${name}:/root/.bitcoin`],
+  // volumes: [
+  //   `./volumes/${dockerConfigs.omnicored.volumeDirName}/${name}:/home/omnicore/.omnicore`,
+  // ],
   volumes: [
-    `./volumes/${dockerConfigs.omnicored.volumeDirName}/${name}:/home/omnicore/.omnicore`,
+    `./volumes/${dockerConfigs.omnicored.volumeDirName}/${name}:/home/bitcoin/.bitcoin`,
   ],
   expose: [
     '18332', // RPC

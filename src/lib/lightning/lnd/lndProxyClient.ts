@@ -1,4 +1,4 @@
-import * as LND from '@radar/lnrpc';
+import * as LND from 'lnrpc/dist/src';
 import { ipcChannels } from 'shared';
 import { LndNode } from 'shared/types';
 import { createIpcSender, IpcSender } from 'lib/ipc/ipcService';
@@ -59,7 +59,7 @@ class LndProxyClient {
     return await this.ipc(ipcChannels.createInvoice, { node, req });
   }
 
-  async payInvoice(node: LndNode, req: LND.SendRequest): Promise<LND.SendResponse> {
+  async payInvoice(node: LndNode, req: LND.SendPaymentRequest): Promise<LND.Payment> {
     return await this.ipc(ipcChannels.payInvoice, { node, req });
   }
 

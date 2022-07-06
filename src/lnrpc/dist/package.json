@@ -1,0 +1,53 @@
+{
+    "name": "lnrpc",
+    "version": "v0.11.1-beta.1",
+    "description": "A Typescript gRPC client for LND with support for all LND sub-servers",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
+    "config": {
+        "lnd-release-tag": "obd",
+        "lnd-url": "https://raw.githubusercontent.com/omnilaboratory/lnd",
+        "protoc-version": "3.6.1"
+    },
+    "scripts": {
+        "test": "mocha \"test/**/*.test.ts\"",
+        "build": "tsc -p tsconfig.build.json && cp -r lnd/. dist/lnd",
+        "clean": "rimraf dist",
+        "lint": "tslint -c tslint.json '{src,test}/**/*.ts' -e 'src/types/generated/**/*.ts' --fix",
+        "generate": "sh scripts/generate_types.sh ${npm_package_config_lnd_release_tag} ${npm_package_config_protoc_version}",
+        "update-protos": "sh scripts/update_protos.sh"
+    },
+    "repository": "https://github.com/RadarTech/lnrpc",
+    "keywords": [
+        "lnd",
+        "lightning network",
+        "grpc",
+        "client",
+        "bitcoin"
+    ],
+    "author": "RadarTech",
+    "license": "MIT",
+    "dependencies": {
+        "@grpc/grpc-js": "latest",
+        "@grpc/proto-loader": "latest",
+        "@types/google-protobuf": "latest",
+        "pkg-dir": "^2.0.0",
+        "protoc-gen-ts": "^0.8.4",
+        "ts-protoc-gen": "latest"
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.1",
+        "@types/node": "^10.14.19",
+        "@types/pkg-dir": "^2.0.1",
+        "glob": "^7.1.5",
+        "mocha": "^5.2.0",
+        "mocha-typescript": "^1.1.17",
+        "rimraf": "^3.0.0",
+        "ts-node": "^8.4.1",
+        "tslint": "^5.20.1",
+        "typescript": "^4.1.3"
+    },
+    "engines": {
+        "node": ">= 10.*"
+    }
+}

@@ -143,11 +143,17 @@ export interface LightningService {
   connectPeers: (node: LightningNode, rpcUrls: string[]) => Promise<void>;
   openChannel: (options: OpenChannelOptions) => Promise<PLN.LightningNodeChannelPoint>;
   closeChannel: (node: LightningNode, channelPoint: string) => Promise<any>;
-  createInvoice: (node: LightningNode, amount: number, memo?: string) => Promise<string>;
+  createInvoice: (
+    node: LightningNode,
+    amount: number,
+    memo?: string,
+    assetId?: number,
+  ) => Promise<string>;
   payInvoice: (
     node: LightningNode,
     invoice: string,
     amount?: number,
+    assetId?: number,
   ) => Promise<PLN.LightningNodePayReceipt>;
 }
 

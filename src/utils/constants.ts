@@ -4,6 +4,8 @@ import bitcoindLogo from 'resources/bitcoin.svg';
 import clightningLogo from 'resources/clightning.png';
 import eclairLogo from 'resources/eclair.png';
 import lndLogo from 'resources/lnd.png';
+import obdLogo from 'resources/obd.png';
+import omnicoredLogo from 'resources/omnicore.png';
 import packageJson from '../../package.json';
 
 // App
@@ -52,7 +54,7 @@ export const BasePorts: Record<NodeImplementation, Record<string, number>> = {
   },
   omnicored: {
     rest: 18332,
-    p2p: 18332,
+    p2p: 19445,
     zmqBlock: 28332,
     zmqTx: 28333,
   },
@@ -121,7 +123,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
   obd: {
     name: 'obd',
     imageName: 'polarlightning/obd',
-    logo: lndLogo,
+    logo: obdLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'lnd',
     command: [
@@ -138,7 +140,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
       '--bitcoin.active',
       '--bitcoin.regtest',
       '--bitcoin.node=bitcoind',
-      '--bitcoind.rpchost={{backendName}}',
+      '--bitcoind.rpchost={{backendName}}:18332',
       '--bitcoind.rpcuser={{rpcUser}}',
       '--bitcoind.rpcpass={{rpcPass}}',
       '--bitcoind.zmqpubrawblock=tcp://{{backendName}}:28332',
@@ -234,8 +236,8 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
   },
   omnicored: {
     name: 'Omni Core',
-    imageName: 'polarlightning/omnicored',
-    logo: bitcoindLogo,
+    imageName: 'registry.cn-beijing.aliyuncs.com/omnicore/first',
+    logo: omnicoredLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'omnicored',
     command: [
@@ -315,8 +317,8 @@ export const defaultRepoState: DockerRepoState = {
       versions: ['0.21.1'],
     },
     omnicored: {
-      latest: '0.0.3',
-      versions: ['0.0.3', '0.0.2'],
+      latest: '0.0.5',
+      versions: ['0.0.5', '0.0.4', '0.0.3', '0.0.2'],
     },
     btcd: {
       latest: '',

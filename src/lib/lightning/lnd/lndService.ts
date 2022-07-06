@@ -1,5 +1,5 @@
 import { debug } from 'electron-log';
-import * as LND from '@radar/lnrpc';
+import * as LND from 'lnrpc/dist/src';
 import { LightningNode, LndNode, OpenChannelOptions } from 'shared/types';
 import * as PLN from 'lib/lightning/types';
 import { LightningService } from 'types';
@@ -133,10 +133,12 @@ class LndService implements LightningService {
     node: LightningNode,
     amount: number,
     memo?: string,
+    assetId?: number,
   ): Promise<string> {
     const req: LND.Invoice = {
-      value: amount.toString(),
+      valueMsat: amount.toString(),
       memo,
+      assetId: assetId,
     };
     const res = await proxy.createInvoice(this.cast(node), req);
     return res.paymentRequest;
@@ -146,19 +148,22 @@ class LndService implements LightningService {
     node: LightningNode,
     invoice: string,
     amount?: number,
+    assetId?: number,
   ): Promise<PLN.LightningNodePayReceipt> {
-    const req: LND.SendRequest = {
+    const req: LND.SendPaymentRequest = {
       paymentRequest: invoice,
-      amt: amount ? amount.toString() : undefined,
+      amtMsat: amount ? amount : undefined,
+      timeoutSeconds: 10000,
+      assetId: assetId,
     };
     const res = await proxy.payInvoice(this.cast(node), req);
     // handle errors manually
-    if (res.paymentError) throw new Error(res.paymentError);
+    // if (res.paymentError) throw new Error(res.paymentError);
 
     const payReq = await proxy.decodeInvoice(this.cast(node), { payReq: invoice });
 
     return {
-      amount: parseInt(payReq.numSatoshis),
+      amount: parseInt(payReq.amtMsat),
       preimage: res.paymentPreimage.toString(),
       destination: payReq.destination,
     };

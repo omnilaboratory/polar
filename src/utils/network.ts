@@ -434,9 +434,9 @@ export const createNetwork = (config: {
   // add managed omnicored nodes
   range(omnicoredNodes).forEach(() => {
     let version = repoState.images.omnicored.latest;
-    if (obdNodes > 0) {
-      const compat = repoState.images.obd.compatibility as Record<string, string>;
-      version = compat[repoState.images.obd.latest];
+    if (lndNodes > 0) {
+      const compat = repoState.images.LND.compatibility as Record<string, string>;
+      version = compat[repoState.images.LND.latest];
     }
     const cmd = getImageCommand(managedImages, 'omnicored', version);
     bitcoin.push(createOmnicoredNetworkNode(network, version, dockerWrap(cmd), status));

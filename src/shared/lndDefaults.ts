@@ -1,4 +1,4 @@
-import * as LND from '@radar/lnrpc';
+import * as LND from 'lnrpc/dist/src';
 import { ipcChannels } from './';
 
 const mapArray = <T>(arr: T[], func: (value: T) => T) => (arr || []).map(func);
@@ -57,9 +57,13 @@ export const defaultLndChannel = (value: Partial<LND.Channel>): LND.Channel => (
   remotePubkey: '',
   channelPoint: '',
   chanId: '',
-  capacity: '0',
+  btcCapacity: '0',
+  assetCapacity: '0',
   localBalance: '0',
   remoteBalance: '0',
+  localAssetBalance: '0',
+  remoteAssetBalance: '0',
+  assetId: 0,
   commitFee: '0',
   commitWeight: '0',
   feePerKw: '0',
@@ -79,7 +83,8 @@ export const defaultLndChannel = (value: Partial<LND.Channel>): LND.Channel => (
   uptime: 0,
   closeAddress: '',
   commitmentType: 1, // LND.CommitmentType.STATIC_REMOTE_KEY
-  pushAmountSat: 0,
+  pushBtcAmountSat: 0,
+  pushAssetAmountSat: 0,
   thawHeight: 0,
   ...value,
 });
@@ -95,7 +100,9 @@ export const defaultLndPendingChannel = (
 ): LND.PendingChannel => ({
   remoteNodePub: '',
   channelPoint: '',
-  capacity: '0',
+  btcCapacity: '0',
+  assetCapacity: '0',
+  assetId: 0,
   localBalance: '0',
   remoteBalance: '0',
   localChanReserveSat: '0',
