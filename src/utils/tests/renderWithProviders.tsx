@@ -39,6 +39,7 @@ export const injections: StoreInjections = {
     removeNode: jest.fn(),
     saveNetworks: jest.fn(),
     loadNetworks: jest.fn(),
+    sendFunds: jest.fn(),
   },
   repoService: {
     load: jest.fn(),

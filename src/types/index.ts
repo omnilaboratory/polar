@@ -111,6 +111,7 @@ export interface DockerLibrary {
   removeNode: (network: Network, node: CommonNode) => Promise<void>;
   saveNetworks: (networks: NetworksFile) => Promise<void>;
   loadNetworks: () => Promise<NetworksFile>;
+  sendFunds: (network: Network, node: CommonNode, address: string) => Promise<void>;
 }
 
 export interface RepoServiceInjection {

@@ -195,6 +195,21 @@ class DockerService implements DockerLibrary {
   }
 
   /**
+   * Removes a single service from the network using docker-compose
+   * @param network the network containing the node
+   * @param node the node to sendFunds
+   * @param address the sendFunds of address
+   */
+  async sendFunds(network: Network, node: CommonNode, address: string) {
+    const result = await compose.exec(
+      node.name,
+      'gosu bitcoin /bin/send_coin.sh ' + address,
+      this.getArgs(network),
+    );
+    info(`Container sendFunds:\n ${result.out || result.err}`);
+  }
+
+  /**
    * Saves the given networks to disk
    * @param networks the list of networks to save
    */

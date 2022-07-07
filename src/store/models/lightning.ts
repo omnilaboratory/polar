@@ -166,6 +166,9 @@ const lightningModel: LightningModel = {
       const btcNode = nodes.bitcoin[0];
       const api = injections.lightningFactory.getService(node);
       const { address } = await api.getNewAddress(node, 2);
+      // sendFunds for asset by docker-compose
+      const network = getStoreState().network.networkById(node.networkId);
+      await injections.dockerService.sendFunds(network, btcNode, address);
       const coins = fromSatsNumeric(sats);
       await injections.bitcoindService.sendFunds(btcNode, address, coins);
       await getStoreActions().bitcoind.mine({
