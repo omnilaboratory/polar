@@ -1,4 +1,4 @@
-# Polar supports asset now
+# Polar supports Omni assets now
 
 > One-click Bitcoin/Omni asset Lightning networks for local app development & testing
 
@@ -18,6 +18,8 @@
 ## Purpose
 
 Polar was built to help Lightning Network application developers quickly spin up one or more networks locally on their computers.
+
+> All the following contents describe the functions and features of asset lightning network.
 
 With Polar you can:
 
