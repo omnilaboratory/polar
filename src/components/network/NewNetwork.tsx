@@ -68,10 +68,10 @@ const NewNetwork: React.SFC = () => {
           layout="vertical"
           colon={false}
           initialValues={{
-            lndNodes: isWindows() ? 2 : 1,
-            clightningNodes: isWindows() ? 0 : 1,
-            eclairNodes: 1,
-            bitcoindNodes: 1,
+            lndNodes: 0,
+            clightningNodes: 0,
+            eclairNodes: 0,
+            bitcoindNodes: 0,
             obdNodes: isWindows() ? 2 : 1,
             omnicoredNodes: 1,
             customNodes: initialCustomValues,
@@ -109,37 +109,40 @@ const NewNetwork: React.SFC = () => {
               <Form.Item
                 name="lndNodes"
                 label={dockerConfigs.LND.name}
+                extra={'Not supported yet.'}
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
-                <InputNumber min={0} max={10} />
+                <InputNumber min={0} max={10} disabled={true} />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item
                 name="clightningNodes"
                 label={dockerConfigs['c-lightning'].name}
-                extra={isWindows() ? l('clightningWindows') : ''}
+                extra={'Not supported yet.'}
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
-                <InputNumber min={0} max={10} disabled={isWindows()} />
+                <InputNumber min={0} max={10} disabled={true} />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item
                 name="eclairNodes"
                 label={dockerConfigs.eclair.name}
+                extra={'Not supported yet.'}
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
-                <InputNumber min={0} max={10} />
+                <InputNumber min={0} max={10} disabled={true} />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item
                 name="bitcoindNodes"
                 label={dockerConfigs.bitcoind.name}
+                extra={'Not supported yet.'}
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
-                <InputNumber min={0} max={10} />
+                <InputNumber min={0} max={10} disabled={true} />
               </Form.Item>
             </Col>
             <Col span={6}>

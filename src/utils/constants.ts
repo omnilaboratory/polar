@@ -122,7 +122,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
   },
   obd: {
     name: 'obd',
-    imageName: 'polarlightning/obd',
+    imageName: 'registry.cn-beijing.aliyuncs.com/omnicore/lnd',
     logo: obdLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'lnd',
@@ -289,8 +289,10 @@ export const defaultRepoState: DockerRepoState = {
   version: 28,
   images: {
     LND: {
-      latest: '0.12.1-beta',
-      versions: ['0.13.0-beta.rc3', '0.12.1-beta', '0.11.1-beta', '0.10.3-beta'],
+      // latest: '0.12.1-beta',
+      // versions: ['0.13.0-beta.rc3', '0.12.1-beta', '0.11.1-beta', '0.10.3-beta'],
+      latest: '',
+      versions: [],
       // not all LND versions are compatible with all bitcoind versions.
       // this mapping specifies the highest compatible bitcoind for each LND version
       compatibility: {
@@ -305,16 +307,22 @@ export const defaultRepoState: DockerRepoState = {
       versions: ['0.0.2'],
     },
     'c-lightning': {
-      latest: '0.10.0',
-      versions: ['0.10.0', '0.9.3', '0.8.2'],
+      // latest: '0.10.0',
+      // versions: ['0.10.0', '0.9.3', '0.8.2'],
+      latest: '',
+      versions: [],
     },
     eclair: {
-      latest: '0.6.0',
-      versions: ['0.6.0', '0.5.0', '0.4.2'],
+      // latest: '0.6.0',
+      // versions: ['0.6.0', '0.5.0', '0.4.2'],
+      latest: '',
+      versions: [],
     },
     bitcoind: {
-      latest: '0.21.1',
-      versions: ['0.21.1'],
+      // latest: '0.21.1',
+      // versions: ['0.21.1'],
+      latest: '',
+      versions: [],
     },
     omnicored: {
       latest: '0.0.5',
