@@ -1,6 +1,6 @@
-# Polar
+# Polar supports Omni assets now
 
-> One-click Bitcoin Lightning networks for local app development & testing
+> One-click Bitcoin/Omni asset Lightning networks for local app development & testing
 
 [![Actions Status](https://github.com/jamaljsr/polar/workflows/CI/badge.svg)](https://github.com/jamaljsr/polar/actions)
 [![codecov](https://codecov.io/gh/jamaljsr/polar/branch/master/graph/badge.svg)](https://codecov.io/gh/jamaljsr/polar)
@@ -18,6 +18,8 @@
 ## Purpose
 
 Polar was built to help Lightning Network application developers quickly spin up one or more networks locally on their computers.
+
+> All the following contents describe the functions and features of asset lightning network.
 
 With Polar you can:
 
@@ -40,6 +42,8 @@ Supported Network Node Versions:
 - [c-lightning](https://github.com/ElementsProject/lightning) - v0.10.0, v0.9.3, v0.8.2
 - [Eclair](https://github.com/ACINQ/eclair/) - v0.6.0, v0.5.0, v0.4.2
 - [Bitcoin Core](https://github.com/bitcoin/bitcoin) - v0.21.1
+- [Omnicore](https://github.com/OmniLayer/omnicore/tree/develop) - ver 0.12.0
+- [OBD](https://github.com/omnilaboratory/obd) - ver 0.2.0
 
 ## Dependencies
 
@@ -54,11 +58,16 @@ You will be prompted to install Docker if Polar cannot detect it automatically
 
 Download Polar v1.3.0 for your OS
 
+<!--
 - Mac ([dmg](https://github.com/jamaljsr/polar/releases/download/v1.3.0/polar-mac-v1.3.0.dmg))
 - Linux ([deb](https://github.com/jamaljsr/polar/releases/download/v1.3.0/polar-linux-amd64-v1.3.0.deb), [AppImage](https://github.com/jamaljsr/polar/releases/download/v1.3.0/polar-linux-x86_64-v1.3.0.AppImage))
 - Windows ([exe](https://github.com/jamaljsr/polar/releases/download/v1.3.0/polar-win-v1.3.0.exe))
 
 Alternative and older version binaries can be found in the [GitHub releases](https://github.com/jamaljsr/polar/releases)
+--->
+
+Lastest version binary can be found in the [GitHub releases](https://github.com/omnilaboratory/polar/releases)
+
 
 ## Help Translate
 
