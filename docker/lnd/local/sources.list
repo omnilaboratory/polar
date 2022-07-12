@@ -1,0 +1,3 @@
+deb https://mirrors.cloud.tencent.com/debian stable main
+deb https://mirrors.cloud.tencent.com//debian-security stable-security main
+deb https://mirrors.cloud.tencent.com//debian stable-updates main

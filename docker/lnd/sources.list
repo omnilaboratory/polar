@@ -1,3 +1,4 @@
-deb https://mirrors.cloud.tencent.com/debian stable main
-deb https://mirrors.cloud.tencent.com//debian-security stable-security main
-deb https://mirrors.cloud.tencent.com//debian stable-updates main
+# only work at qcloud-vps
+deb http://mirrors.tencentyun.com/debian stable main
+#deb http://mirrors.cloud.tencent.com//debian-security stable-security main
+#deb http://mirrors.cloud.tencent.com//debian stable-updates main
