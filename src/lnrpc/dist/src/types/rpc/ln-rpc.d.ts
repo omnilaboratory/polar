@@ -791,6 +791,7 @@ export interface Invoice {
   rHash?: Buffer | string;
   assetId?: number;
   valueMsat?: string;
+  amount?: string;
   settled?: boolean;
   creationDate?: string;
   settleDate?: string;
@@ -863,6 +864,7 @@ export interface PayReq {
   routeHints?: RouteHint[];
   paymentAddr?: Buffer | string;
   amtMsat: string;
+  amount: string;
   assetId: number;
   features?: Array<[number, Feature]>;
 }

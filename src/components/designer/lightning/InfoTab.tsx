@@ -42,11 +42,11 @@ const InfoTab: React.FC<Props> = ({ node }) => {
       const { confirmed, unconfirmed } = nodeState.walletBalance;
       details.push({
         label: l('confirmedBalance'),
-        value: `${format(confirmed)} sats`,
+        value: `${format(confirmed)} unit`,
       });
       details.push({
         label: l('unconfirmedBalance'),
-        value: `${format(unconfirmed)} sats`,
+        value: `${format(unconfirmed)} unit`,
       });
     }
     if (nodeState.info) {

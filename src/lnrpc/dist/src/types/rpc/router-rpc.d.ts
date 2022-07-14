@@ -59,6 +59,7 @@ export interface SendPaymentRequest {
   dest?: Buffer | string;
   amtMsat?: number;
   assetId?: number;
+  assetAmt?: number;
   paymentHash?: Buffer | string;
   finalCltvDelta?: number;
   paymentAddr?: Uint8Array | string;

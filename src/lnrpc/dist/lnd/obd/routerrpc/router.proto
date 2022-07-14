@@ -160,6 +160,11 @@ message SendPaymentRequest {
     int64 amt_msat = 12;
     uint32 asset_id = 23;
 
+    // obd update update wxf
+    // Number of omniAmount to send. this field is only for asset transfer,
+    // amt_msat only used for btc
+    int64 asset_amt = 2;
+    
     // The hash to use within the payment's HTLC
     bytes payment_hash = 3;
 

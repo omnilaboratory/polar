@@ -36,7 +36,7 @@ const LightningNodeSelect: React.FC<Props> = ({
   useMemo(() => {
     if (nodes && nodes[selected] && nodes[selected].walletBalance) {
       const balances = nodes[selected].walletBalance as LightningNodeBalances;
-      setHelp(`${l('balance')}: ${format(balances.confirmed || '0')} sats`);
+      setHelp(`${l('balance')}: ${format(balances.confirmed || '0')} unit`);
     } else {
       setHelp('');
     }

@@ -3168,6 +3168,9 @@ message Invoice {
     */
     int64 value_msat = 23;
 
+    // omniAmount, it's for asset transfer,  btc use value_msat
+    int64 amount = 5;
+
     // Whether this invoice has been fulfilled
     bool settled = 19 [deprecated = true];
 
@@ -3699,6 +3702,8 @@ message PayReq {
     repeated RouteHint route_hints = 10;
     bytes payment_addr = 11;
     int64 amt_msat = 12;
+    // number of omniAmount, btc use amt_msat
+    int64 amount = 15;
     uint32 asset_id = 14;
     map<uint32, Feature> features = 13;
 }

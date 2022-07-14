@@ -23,9 +23,9 @@ const Channel: React.FC<Props> = ({ link, from, to }) => {
 
   const channelDetails: DetailValues = [
     { label: l('status'), value: status },
-    { label: l('capacity'), value: `${format(capacity)} sats` },
-    { label: l('sourceBalance'), value: `${format(fromBalance)} sats` },
-    { label: l('destinationBalance'), value: `${format(toBalance)} sats` },
+    { label: l('capacity'), value: `${format(capacity)} unit` },
+    { label: l('sourceBalance'), value: `${format(fromBalance)} unit` },
+    { label: l('destinationBalance'), value: `${format(toBalance)} unit` },
     {
       label: l('channelPoint'),
       value: (

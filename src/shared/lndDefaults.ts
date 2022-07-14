@@ -1,4 +1,4 @@
-import * as LND from 'lnrpc/dist/src';
+import * as LND from '../lnrpc/dist/src';
 import { ipcChannels } from './';
 
 const mapArray = <T>(arr: T[], func: (value: T) => T) => (arr || []).map(func);

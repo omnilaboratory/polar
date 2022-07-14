@@ -70,7 +70,7 @@ const CreateInvoiceModal: React.FC<Props> = ({ network }) => {
           <Col span={12}>
             <Form.Item
               name="amount"
-              label={l('amountLabel') + ' (sats)'}
+              label={l('amountLabel') + ' (unit)'}
               rules={[{ required: true, message: l('cmps.forms.required') }]}
             >
               <InputNumber<number>

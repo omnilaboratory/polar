@@ -36,7 +36,7 @@ const LightningDetails: React.FC<Props> = ({ node }) => {
   if (node.status === Status.Started && nodeState) {
     if (nodeState.walletBalance) {
       const { confirmed } = nodeState.walletBalance;
-      extra = <strong>{abbreviate(confirmed)} sats</strong>;
+      extra = <strong>{abbreviate(confirmed)} unit</strong>;
     }
   }
 

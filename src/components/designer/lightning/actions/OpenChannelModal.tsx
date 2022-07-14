@@ -121,7 +121,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
       </Row>
       <Form.Item
         name="sats"
-        label={l('capacityLabel') + ' (sats)'}
+        label={l('capacityLabel') + ' (unit)'}
         rules={[{ required: true, message: l('cmps.forms.required') }]}
       >
         <InputNumber<number>
@@ -134,7 +134,7 @@ const OpenChannelModal: React.FC<Props> = ({ network }) => {
       </Form.Item>
       <Form.Item
         name="assetSats"
-        label={'asset ' + l('capacityLabel') + ' (sats)'}
+        label={'asset ' + l('capacityLabel') + ' (unit)'}
         rules={[{ required: true, message: l('cmps.forms.required') }]}
       >
         <InputNumber<number>

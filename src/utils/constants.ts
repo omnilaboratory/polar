@@ -122,7 +122,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
   },
   obd: {
     name: 'obd',
-    imageName: 'registry.cn-beijing.aliyuncs.com/omnicore/lnd',
+    imageName: 'ccr.ccs.tencentyun.com/omnicore/ob-lnd',
     logo: obdLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'lnd',
@@ -236,7 +236,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
   },
   omnicored: {
     name: 'Omni Core',
-    imageName: 'registry.cn-beijing.aliyuncs.com/omnicore/first',
+    imageName: 'ccr.ccs.tencentyun.com/omnicore/omnicored',
     logo: omnicoredLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'omnicored',
@@ -303,8 +303,8 @@ export const defaultRepoState: DockerRepoState = {
       },
     },
     obd: {
-      latest: '0.0.2',
-      versions: ['0.0.2'],
+      latest: '0.0.1',
+      versions: ['0.0.1'],
     },
     'c-lightning': {
       // latest: '0.10.0',
@@ -325,8 +325,8 @@ export const defaultRepoState: DockerRepoState = {
       versions: [],
     },
     omnicored: {
-      latest: '0.0.5',
-      versions: ['0.0.5', '0.0.4', '0.0.3', '0.0.2'],
+      latest: '0.0.1',
+      versions: ['0.0.1'],
     },
     btcd: {
       latest: '',

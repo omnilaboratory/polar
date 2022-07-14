@@ -136,7 +136,7 @@ class LndService implements LightningService {
     assetId?: number,
   ): Promise<string> {
     const req: LND.Invoice = {
-      valueMsat: amount.toString(),
+      amount: amount.toString(),
       memo,
       assetId: assetId,
     };
@@ -152,7 +152,7 @@ class LndService implements LightningService {
   ): Promise<PLN.LightningNodePayReceipt> {
     const req: LND.SendPaymentRequest = {
       paymentRequest: invoice,
-      amtMsat: amount ? amount : undefined,
+      assetAmt: amount ? amount : undefined,
       timeoutSeconds: 10000,
       assetId: assetId,
     };
@@ -163,7 +163,7 @@ class LndService implements LightningService {
     const payReq = await proxy.decodeInvoice(this.cast(node), { payReq: invoice });
 
     return {
-      amount: parseInt(payReq.amtMsat),
+      amount: parseInt(payReq.amount),
       preimage: res.paymentPreimage.toString(),
       destination: payReq.destination,
     };
