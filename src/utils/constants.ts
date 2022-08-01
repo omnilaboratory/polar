@@ -303,8 +303,8 @@ export const defaultRepoState: DockerRepoState = {
       },
     },
     obd: {
-      latest: '0.0.3',
-      versions: ['0.0.3'],
+      latest: '0.0.7',
+      versions: ['0.0.7'],
     },
     'c-lightning': {
       // latest: '0.10.0',
