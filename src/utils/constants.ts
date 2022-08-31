@@ -130,6 +130,7 @@ export const dockerConfigs: Record<NodeImplementation, DockerConfig> = {
       'lnd-debug',
       '--noseedbackup',
       '--trickledelay=5000',
+      '--maxpendingchannels=100',
       '--alias={{name}}',
       '--externalip={{name}}',
       '--tlsextradomain={{name}}',
@@ -303,8 +304,8 @@ export const defaultRepoState: DockerRepoState = {
       },
     },
     obd: {
-      latest: '0.0.7',
-      versions: ['0.0.7'],
+      latest: '0.0.9',
+      versions: ['0.0.9'],
     },
     'c-lightning': {
       // latest: '0.10.0',
